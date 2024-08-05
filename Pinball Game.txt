@@ -1,0 +1,92 @@
+import turtle
+import random
+
+# Set up the window
+display = turtle.Screen()
+display.title('Roshan Pinball')
+display.bgcolor('Grey')
+display.setup(width=610, height=610)
+
+# Set up the ball
+ball = turtle.Turtle()
+ball.shape('circle')
+ball.color('red')
+ball.penup()
+ball.speed(0)
+ball.goto(0, 250)
+ball.dy = -7
+ball.dx = random.randint(-5, 5)
+
+# Set up the paddle
+paddle = turtle.Turtle()
+paddle.shape('square')
+paddle.color('Lightblue')
+paddle.shapesize(stretch_wid=1, stretch_len=5)
+paddle.penup()
+paddle.speed(0)
+paddle.goto(0, -250)
+
+# Set up the score
+score = 0
+score_pen = turtle.Turtle()
+score_pen.hideturtle()
+score_pen.penup()
+score_pen.goto(-290, 270)
+score_pen.color('white')
+score_pen.write(f'Score: {score}', align='left', font=('Arial', 14, 'normal'))
+
+
+# Move the paddle left and right
+def movepaddle_left():
+    x = paddle.xcor()
+    x -= 20
+    paddle.setx(x)
+    if paddle.xcor() <= -240:
+        paddle.setx(-240)
+
+
+def movepaddle_right():
+    x = paddle.xcor()
+    x += 20
+    paddle.setx(x)
+    if paddle.xcor() >= 240:
+        paddle.setx(240)
+
+
+# Keyboard bindings
+display.listen()
+display.onkeypress(movepaddle_left, 'Left')
+display.onkeypress(movepaddle_right, 'Right')
+
+# Main game loop
+while True:
+    display.update()
+
+    # Move the ball
+    ball.setx(ball.xcor() + ball.dx)
+    ball.sety(ball.ycor() + ball.dy)
+
+    # collision with the walls
+    if ball.xcor() > 290 or ball.xcor() < -290:
+        ball.dx *= -1
+
+    # collision with the paddle
+    if ball.ycor() < -223 and (paddle.xcor() - 50 < ball.xcor() < paddle.xcor() + 50):
+        ball.dy *= -1
+        score += 10
+        score_pen.clear()
+        score_pen.write(f'Score: {score}', align='left', font=('Courier', 16, 'normal'))
+
+    # Check for a collision with the top wall
+    if ball.ycor() > 270:
+        ball.dy *= -1
+
+    # Check for a game over
+    if ball.ycor() < -290:
+        score_pen.clear()
+        score_pen.goto(0, 0)
+        # Game over
+        score_pen.write('Game over!-Score : {}'.format(score), align='center', font=('Courier', 24, 'normal'))
+        break
+
+display.mainloop()
